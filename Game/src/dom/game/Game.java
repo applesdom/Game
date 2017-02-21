@@ -15,6 +15,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
@@ -30,7 +31,7 @@ import javax.swing.Timer;
  * @version 1.0
  * @see dom.game.Scene
  */
-public abstract class Game
+public class Game
 {
 	private static final int DEFAULT_FPS = 60;
 	
@@ -43,6 +44,8 @@ public abstract class Game
 	private static Timer renderTimer;
 	
 	private static Scene currentScene = null;
+	
+	private static Map<String, Object> dataIndex;
 	
 	//
 
@@ -189,6 +192,18 @@ public abstract class Game
 		frame.dispose();
 	}
 
+	//
+	
+	public static void store(String name, Object o)
+	{
+		dataIndex.put(name, o);
+	}
+	
+	public static Object retrieve(String name)
+	{
+		return dataIndex.get(name);
+	}
+	
 	//
 	
 	public static BufferedImage loadImage(String imagePath) throws IOException

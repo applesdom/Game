@@ -26,7 +26,7 @@ public class ExampleMenuScene extends Scene
 	{
 		try
 		{
-			background = ExampleGame.loadImage("test.png");
+			background = Game.loadImage("test.png");
 		}
 		catch(IOException e)
 		{
