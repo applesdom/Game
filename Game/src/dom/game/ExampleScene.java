@@ -6,13 +6,6 @@ import java.awt.Graphics2D;
 public class ExampleScene extends Scene
 {
 	private int joe;
-	
-	//
-	
-	public ExampleScene()
-	{
-		super(60, 400, 300);
-	}
 
 	//
 	

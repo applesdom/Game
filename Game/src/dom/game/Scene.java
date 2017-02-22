@@ -23,35 +23,6 @@ import java.awt.event.MouseWheelListener;
  */
 public abstract class Scene implements KeyListener, MouseListener, MouseWheelListener, MouseMotionListener
 {
-	private final int fps;
-	
-	private final int width, height;
-	
-	//
-	
-	/**
-	 * This method should be overwritten by a subclass to specify
-	 * the width, height, and FPS for the scene.  Subclasses that
-	 * require no access to the game loop should specify an FPS of
-	 * -1.
-	 * 
-	 * @param  fps
-     *         The FPS of the scene
-     * @param  width
-     *         The width of the scene
-     * @param  height
-     *         The height of the scene
-	 */
-	public Scene(int fps, int width, int height)
-	{
-		this.fps = fps;
-		
-		this.width = width;
-		this.height = height;
-	}
-	
-	//
-	
 	/**
 	 * Called once when the scene is loaded by the {@link dom.game.Game Game}.
 	 * All instance variables should be instantialized in this method.
@@ -73,23 +44,6 @@ public abstract class Scene implements KeyListener, MouseListener, MouseWheelLis
      *         A graphics object provided by the {@link dom.game.Game Game} class during rendering.
 	 */
 	public abstract void render(Graphics2D g);
-	
-	//
-	
-	public int getFPS()
-	{
-		return fps;
-	}
-
-	public int getWidth()
-	{
-		return width;
-	}
-	
-	public int getHeight()
-	{
-		return height;
-	}
 	
 	//
 

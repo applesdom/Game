@@ -34,6 +34,11 @@ import javax.swing.Timer;
 public class Game
 {
 	private static final int DEFAULT_FPS = 60;
+	private static final int DEFAULT_WIDTH = 400;
+	private static final int DEFAULT_HEIGHT = 300;
+	
+	private static int fps;
+	private static int width, height;
 	
 	private static JFrame frame;
 	private static JComponent canvas;
@@ -49,19 +54,17 @@ public class Game
 	
 	//
 
-	/**
-	 * Opens the game window with the specified dimensions.  This method
-	 * is automatically called if no window is open when a {@link dom.game.Scene Scene} is
-	 * loaded.  {@link dom.game.Scene Scene}s will be magnified to fit any screen size, regardless
-	 * of their specified size, although the aspect ratio will be preserved.
-	 * 
-	 * @param  width
-	 * 		   The width of the game window
-	 * @param  width
-	 * 		   The width of the game window
-	 */
-	public static void launch(int width, int height)
+	public static void launch()
 	{
+		launch(DEFAULT_FPS, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	}
+	
+	public static void launch(int fps, int width, int height)
+	{
+		Game.fps = fps;
+		Game.width = width;
+		Game.height = height;
+		
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
@@ -80,23 +83,27 @@ public class Game
 						{
 							Graphics2D g2 = (Graphics2D) g.create();
 							
-							if((double) getWidth() / getHeight() >= (double) currentScene.getWidth() / currentScene.getHeight())
+							if((double) getWidth() / getHeight() >= (double) Game.getWidth() / Game.getHeight())
 							{
-								double scaleFactor = (double) getHeight() / currentScene.getHeight();
+								double scaleFactor = (double) getHeight() / Game.getHeight();
 								
 								g2.scale(scaleFactor, scaleFactor);
 								
-								g2.translate(((getWidth() / scaleFactor) - currentScene.getWidth()) / 2, 0);
+								g2.translate(((getWidth() / scaleFactor) - Game.getWidth()) / 2, 0);
+								
+								g2.clipRect(0, 0, Game.getWidth(), Game.getHeight());
 								
 								currentScene.render(g2);
 							}
 							else
 							{
-								double scaleFactor = (double) getWidth() / currentScene.getWidth();
+								double scaleFactor = (double) getWidth() / Game.getWidth();
 								
 								g2.scale(scaleFactor, scaleFactor);
 								
-								g2.translate(0, ((getHeight() / scaleFactor) - currentScene.getHeight()) / 2);
+								g2.translate(0, ((getHeight() / scaleFactor) - Game.getHeight()) / 2);
+								
+								g2.clipRect(0, 0, Game.getWidth(), Game.getHeight());
 								
 								currentScene.render(g2);
 							}
@@ -115,7 +122,7 @@ public class Game
 		canvas.addMouseMotionListener(gameInputHelper);
 		canvas.addMouseWheelListener(gameInputHelper);
 		
-		tickTimer = new Timer(1000 / DEFAULT_FPS, new ActionListener()
+		tickTimer = new Timer(1000 / fps, new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
 					{
@@ -128,7 +135,7 @@ public class Game
 		tickTimer.setInitialDelay(0);
 		tickTimer.start();
 		
-		renderTimer = new Timer(1000 / DEFAULT_FPS, new ActionListener()
+		renderTimer = new Timer(1000 / fps, new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{	
@@ -149,29 +156,14 @@ public class Game
 	 */
 	public static void loadScene(Scene scene)
 	{
+		currentScene = null;
+		
 		if(frame == null || canvas == null || tickTimer == null || renderTimer == null)
 		{
-			launch(scene.getWidth(), scene.getHeight());
+			launch();
 		}
 		
 		scene.init();
-		
-		tickTimer.stop();
-		renderTimer.stop();
-		
-		if(scene.getFPS() > 0)
-		{
-			tickTimer.setDelay(1000 / scene.getFPS());
-			renderTimer.setDelay(1000 / scene.getFPS());
-			
-			tickTimer.start();
-			renderTimer.start();
-		}
-		else
-		{
-			renderTimer.setDelay(1000 / DEFAULT_FPS);
-			renderTimer.start();
-		}
 		
 		currentScene = scene;
 	}
@@ -206,6 +198,54 @@ public class Game
 	
 	//
 	
+	public static int getFPS()
+	{
+		return fps;
+	}
+	
+	public static void setFPS(int fps)
+	{
+		Game.fps = fps;
+		
+		tickTimer.stop();
+		renderTimer.stop();
+		
+		tickTimer.setDelay(1000 / fps);
+		renderTimer.setDelay(1000 / fps);
+		
+		tickTimer.stop();
+		renderTimer.stop();
+	}
+	
+	public static int getWidth()
+	{
+		return width;
+	}
+	
+	public static void setWidth(int width)
+	{
+		Game.width = width;
+	}
+	
+	public static int getHeight()
+	{
+		return height;
+	}
+	
+	public static void setHeight(int height)
+	{
+		Game.height = height;
+	}
+	
+	//
+	
+	public static void setResizable(boolean flag)
+	{
+		frame.setResizable(flag);
+	}
+	
+	//
+	
 	public static BufferedImage loadImage(String imagePath) throws IOException
 	{
 		return ImageIO.read(ClassLoader.getSystemResource("test.png"));
@@ -217,11 +257,11 @@ public class Game
 	{
 		private void adjustPoint(MouseEvent e)
 		{
-			if((double) canvas.getWidth() / canvas.getHeight() >= (double) currentScene.getWidth() / currentScene.getHeight())
+			if((double) canvas.getWidth() / canvas.getHeight() >= (double) Game.getWidth() / Game.getHeight())
 			{
-				double scaleFactor = (double) canvas.getHeight() / currentScene.getHeight();
+				double scaleFactor = (double) canvas.getHeight() / Game.getHeight();
 				
-				e.translatePoint((int) -(canvas.getWidth() - (currentScene.getWidth() * scaleFactor)) / 2, 0);
+				e.translatePoint((int) -(canvas.getWidth() - (Game.getWidth() * scaleFactor)) / 2, 0);
 				
 				e.translatePoint((int) (e.getX() * ((1 / scaleFactor) - 1)), (int) (e.getY() * ((1 / scaleFactor) - 1)));
 				
@@ -229,9 +269,9 @@ public class Game
 			}
 			else
 			{
-				double scaleFactor = (double) canvas.getWidth() / currentScene.getWidth();
+				double scaleFactor = (double) canvas.getWidth() / Game.getWidth();
 				
-				e.translatePoint(0, (int) -(canvas.getHeight() - (currentScene.getHeight() * scaleFactor)) / 2);
+				e.translatePoint(0, (int) -(canvas.getHeight() - (Game.getHeight() * scaleFactor)) / 2);
 				
 				e.translatePoint((int) (e.getX() * ((1 / scaleFactor) - 1)), (int) (e.getY() * ((1 / scaleFactor) - 1)));
 				
